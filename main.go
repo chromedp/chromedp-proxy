@@ -22,6 +22,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strings"
 
 	"github.com/gorilla/websocket"
 )
@@ -116,6 +117,9 @@ func main() {
 	log.Fatal(http.ListenAndServe(*flagListen, mux))
 }
 
+// proxyWS proxies in and out messages for a websocket connection, logging the
+// message to the logger the the passed prefix. Any error encountered will be
+// sent to errc.
 func proxyWS(ctxt context.Context, logger *log.Logger, prefix string, in, out *websocket.Conn, errc chan error) {
 	var mt int
 	var buf []byte
@@ -144,6 +148,8 @@ func proxyWS(ctxt context.Context, logger *log.Logger, prefix string, in, out *w
 	}
 }
 
+// checkVersion retrieves the version information for the remote endpoint, and
+// formats it appropriately.
 func checkVersion() ([]byte, error) {
 	cl := &http.Client{}
 	req, err := http.NewRequest("GET", "http://"+*flagRemote+"/json/version", nil)
@@ -175,17 +181,20 @@ var (
 	cleanRE = regexp.MustCompile(`[^a-zA-Z0-9_\-\.]`)
 )
 
+// createLog creates a log for the specified id based on flags.
 func createLog(id string) (io.Closer, *log.Logger) {
 	var f io.Closer
 	var w io.Writer = os.Stdout
 	if !*flagNoLog && *flagLogMask != "" {
-		l, err := os.OpenFile(fmt.Sprintf(*flagLogMask, cleanRE.ReplaceAllString(id, "")), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+		filename := *flagLogMask
+		if strings.Contains(*flagLogMask, "%s") {
+			filename = fmt.Sprintf(*flagLogMask, cleanRE.ReplaceAllString(id, ""))
+		}
+		l, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		f = l
-		w = io.MultiWriter(os.Stdout, l)
+		f, w = l, io.MultiWriter(os.Stdout, l)
 	}
 	return f, log.New(w, "", log.LstdFlags)
 }
