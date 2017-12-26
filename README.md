@@ -1,28 +1,27 @@
 # About chromedp-proxy
 
 `chromedp-proxy` is a simple command-line tool to proxy and log [Chrome
-Debugging Protocol](https://chromedevtools.github.io/devtools-protocol/)
-sessions sent from a CDP client to acd CDP browser. `chromedp-proxy` captures
-and (by default) logs all of the WebSocket messages sent during a CDP session
-between a remote and local endpoint, and can be used to expose a CDP browser
-listening on localhost to a remote endpoint.
+Debugging Protocol] sessions sent from a CDP client to acd CDP browser.
+`chromedp-proxy` captures and (by default) logs all of the WebSocket messages
+sent during a CDP session between a remote and local endpoint, and can be used
+to expose a CDP browser listening on localhost to a remote endpoint.
 
 `chromedp-proxy` is mainly used to capture and debug the wireline protocol sent
 from DevTools/Selenium/Puppeteer to Chrome/Chromium/headless_shell/etc. It was
 originally written for debugging wireline problems/issues with the
-[`chromedp`](https://github.com/chromedp) project.
+[`chromedp`][2] project.
 
-## Installation
+## Installing
 
 Install in the usual Go way:
 
 ```sh
-$ go get -u github.com/knq/chromedp/cmd/chromedp-proxy
+$ go get -u github.com/chromedp/chromedp-proxy
 ```
 
-## Use
+## Using
 
-By default, `chromedp-proxy` will listen on localhost:9223 and will proxy
+By default, `chromedp-proxy` listens on localhost:9223 and proxies
 requests to/from localhost:9222:
 
 ```sh
@@ -36,7 +35,7 @@ external address/port:
 $ chromedp-proxy -l 192.168.1.10:9222
 ```
 
-By default, `chromedp-proxy` will log to both `stdout` and to
+By default, `chromedp-proxy` logs to both `stdout` and to
 `$PWD/logs/cdp-<id>.log`, but that can be changed through flags:
 
 ```sh
@@ -50,7 +49,7 @@ $ chromedp-proxy -log ''
 $ chromedp-proxy -log '/var/log/cdp/session-%s.log'
 ```
 
-## Flags:
+### Command-line options
 
 ```sh
 $ ./chromedp-proxy -help
@@ -63,3 +62,6 @@ Usage of ./chromedp-proxy:
   -r string
     	remote address (default "localhost:9222")
 ```
+
+[1]: https://chromedevtools.github.io/devtools-protocol/
+[2]: https://github.com/chromedp
