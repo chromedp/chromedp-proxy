@@ -1,15 +1,16 @@
 # About chromedp-proxy
 
-`chromedp-proxy` is a simple command-line tool to proxy and log [Chrome
-Debugging Protocol] sessions sent from a CDP client to acd CDP browser.
-`chromedp-proxy` captures and (by default) logs all of the WebSocket messages
-sent during a CDP session between a remote and local endpoint, and can be used
-to expose a CDP browser listening on localhost to a remote endpoint.
+`chromedp-proxy` is a simple command-line tool to proxy and log
+[Chrome Debugging Protocol][devtools-protocol] sessions sent from a CDP client
+to acd CDP browser. `chromedp-proxy` captures and (by default) logs all of the
+WebSocket messages sent during a CDP session between a remote and local
+endpoint, and can be used to expose a CDP browser listening on localhost to a
+remote endpoint.
 
 `chromedp-proxy` is mainly used to capture and debug the wireline protocol sent
 from DevTools/Selenium/Puppeteer to Chrome/Chromium/headless_shell/etc. It was
 originally written for debugging wireline problems/issues with the
-[`chromedp`][2] project.
+[`chromedp`][chromedp] project.
 
 ## Installing
 
@@ -21,8 +22,8 @@ $ go get -u github.com/chromedp/chromedp-proxy
 
 ## Using
 
-By default, `chromedp-proxy` listens on localhost:9223 and proxies
-requests to/from localhost:9222:
+By default, `chromedp-proxy` listens on `localhost:9223` and proxies
+requests to/from `localhost:9222`:
 
 ```sh
 $ chromedp-proxy
@@ -63,5 +64,5 @@ Usage of ./chromedp-proxy:
     	remote address (default "localhost:9222")
 ```
 
-[1]: https://chromedevtools.github.io/devtools-protocol/
-[2]: https://github.com/chromedp
+[devtools-protocol]: https://chromedevtools.github.io/devtools-protocol/
+[chromedp]: https://github.com/chromedp
