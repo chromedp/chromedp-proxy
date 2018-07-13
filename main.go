@@ -1,9 +1,9 @@
 // chromedp-proxy provides a cli utility that will proxy requests from a Chrome
-// Debugging Protocol client to a application instance.
+// DevTools Protocol client to a browser instance.
 //
 // chromedp-proxy is particularly useful for recording events/data from
 // Selenium (ChromeDriver), Chrome DevTools in the browser, or for debugging
-// remote application instances compatible with the debugging protocol.
+// remote application instances compatible with the devtools protocol.
 //
 // Please see README.md for more information on using chromedp-proxy.
 package main

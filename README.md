@@ -1,7 +1,7 @@
 # About chromedp-proxy
 
 `chromedp-proxy` is a simple command-line tool to proxy and log [Chrome
-Debugging Protocol][devtools-protocol] sessions sent from a CDP client to a CDP
+DevTools Protocol][devtools-protocol] sessions sent from a CDP client to a CDP
 browser session. `chromedp-proxy` captures and (by default) logs all of the
 WebSocket messages sent during a CDP session between a remote and local
 endpoint, and can be used to expose a CDP browser listening on localhost to a
