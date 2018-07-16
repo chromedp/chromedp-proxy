@@ -59,7 +59,7 @@ func main() {
 	simplep := httputil.NewSingleHostReverseProxy(&url.URL{Scheme: "http", Host: *flagRemote})
 	mux.Handle("/json", simplep)
 	mux.Handle("/", simplep)
-	mux.HandleFunc("/devtools/page/", func(res http.ResponseWriter, req *http.Request) {
+	mux.HandleFunc("/devtools/", func(res http.ResponseWriter, req *http.Request) {
 		id := path.Base(req.URL.Path)
 		f, logger := createLog(id)
 		if f != nil {
@@ -71,12 +71,12 @@ func main() {
 		if err != nil {
 			msg := fmt.Sprintf("version error, got: %v", err)
 			logger.Println(msg)
-			http.Error(res, msg, 500)
+			http.Error(res, msg, http.StatusInternalServerError)
 			return
 		}
 		logger.Printf("endpoint %s reported: %s", *flagRemote, string(ver))
 
-		endpoint := "ws://" + *flagRemote + "/devtools/page/" + id
+		endpoint := "ws://" + *flagRemote + path.Join(path.Dir(req.URL.Path), id)
 
 		// connect outgoing websocket
 		logger.Printf("connecting to %s", endpoint)
@@ -84,7 +84,7 @@ func main() {
 		if err != nil {
 			msg := fmt.Sprintf("could not connect to %s, got: %v", endpoint, err)
 			logger.Println(msg)
-			http.Error(res, msg, 500)
+			http.Error(res, msg, http.StatusInternalServerError)
 			return
 		}
 		defer pres.Body.Close()
@@ -98,7 +98,7 @@ func main() {
 		if err != nil {
 			msg := fmt.Sprintf("could not upgrade websocket from %s, got: %v", req.RemoteAddr, err)
 			logger.Println(msg)
-			http.Error(res, msg, 500)
+			http.Error(res, msg, http.StatusInternalServerError)
 			return
 		}
 		defer in.Close()
@@ -118,7 +118,7 @@ func main() {
 }
 
 // proxyWS proxies in and out messages for a websocket connection, logging the
-// message to the logger the the passed prefix. Any error encountered will be
+// message to the logger with the passed prefix. Any error encountered will be
 // sent to errc.
 func proxyWS(ctxt context.Context, logger *log.Logger, prefix string, in, out *websocket.Conn, errc chan error) {
 	var mt int
@@ -134,7 +134,7 @@ func proxyWS(ctxt context.Context, logger *log.Logger, prefix string, in, out *w
 				return
 			}
 
-			logger.Printf("%s %s", prefix, string(buf))
+			logger.Println(prefix, string(buf))
 
 			err = out.WriteMessage(mt, buf)
 			if err != nil {
@@ -178,7 +178,7 @@ func checkVersion() ([]byte, error) {
 }
 
 var (
-	cleanRE = regexp.MustCompile(`[^a-zA-Z0-9_\-\.]`)
+	idCleanRE = regexp.MustCompile(`[^a-zA-Z0-9_\-\.]`)
 )
 
 // createLog creates a log for the specified id based on flags.
@@ -188,7 +188,7 @@ func createLog(id string) (io.Closer, *log.Logger) {
 	if !*flagNoLog && *flagLogMask != "" {
 		filename := *flagLogMask
 		if strings.Contains(*flagLogMask, "%s") {
-			filename = fmt.Sprintf(*flagLogMask, cleanRE.ReplaceAllString(id, ""))
+			filename = fmt.Sprintf(*flagLogMask, idCleanRE.ReplaceAllString(id, ""))
 		}
 		l, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 		if err != nil {
